@@ -65,9 +65,9 @@ app.get("/dishes", (req, res) => {
 })
 //Post new dishes
 app.post("/dishes", (req, res) => {
-    const query = "INSERT INTO dishes (id,name,price) VALUES (?,?,?)";
-    const { id, name, price } = req.body;
-    dataBase.query(query, { replacements: [id, name, price] })
+    const query = "INSERT INTO dishes (id,dish,price) VALUES (?,?,?)";
+    const { id, dish, price } = req.body;
+    dataBase.query(query, { replacements: [id, dish, price] })
         .then ((response) => {
             res.json({status: "Dish created", user: req.body });
         }). catch((e) => console.log(e));
@@ -98,11 +98,39 @@ app.delete("/dishes",dishExist, (req,res) => {
 //Edit existing dishes
 app.put("/dishes", dishExist, (req,res) => {
     const id = req.query.id;
-    const query = "UPDATE dishes SET name = ?, price = ? WHERE id = ?";
-    const {name,price} = req.body;
-    dataBase.query(query, {replacements: [name,price,id]})
+    const query = "UPDATE dishes SET dish = ?, price = ? WHERE id = ?";
+    const {dish,price} = req.body;
+    dataBase.query(query, {replacements: [dish,price,id]})
     .then ((response) => {
         res.json({status: "Dish update successful"});
     }).catch((e) => console.error(e))
+})
+//Get orders 
+app.get("/orders", (req,res) => {
+    const orders = 
+    "SELECT orders.*, status.state, users.name, users.address, dishes.dish, dishes.price FROM orders JOIN status ON status.id = orders.code_status JOIN users ON users.id = orders.id_user JOIN dishes ON dishes.id = orders.dishes";
+    dataBase.query(orders, {type: sequelize.QueryTypes.SELECT})
+        .then((data) => {
+            res.json(data);
+        }).catch((e) => console.log(e));
+})
+//Create new orders
+app.post("/orders",userExist, (req,res) => {
+    const query = "INSERT INTO orders (id,code_status,hour,dishes,total,id_user) VALUES (?,?,?,?,?,?)";
+    const {id,code_status,hour,dishes,total,id_user} = req.body;
+    dataBase.query(query, {replacements: [id,code_status,hour,dishes,total,id_user]})
+        .then((data) => {
+            res.json({status: "Order created", order:req.body});
+        }).catch((e) => console.log(e));
+})
+//Actualize status of existing orders ---> ADMIN <---
+app.put("/orders",(req,res) => {
+    const id = req.query.id;
+    const query = "UPDATE orders SET code_status = ? WHERE id = ?";
+    const {code_status} = req.body;
+    dataBase.query(query, {replacements: [code_status,id]})
+    .then((data) => {
+        res.json({status: "Order status update successful"});
+    }).catch((e) => console.log(e));
 })
 app.listen(4000, (res, req) => console.log("Listening in the port 4000"));
