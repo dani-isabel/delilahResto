@@ -10,6 +10,24 @@ console.log(decode);
 const dataBase = new sequelize("mysql://root:@localhost:3306/delilahresto");
 const app = express();
 app.use(express.json());
+//Validate user and password 
+const validateUser = (req, res, next) => {
+    const {username,password} = req.body;
+    const exist = "SELECT * FROM users WHERE username = ? AND password = ?";
+    dataBase.query(exist, { replacements: [username,password], type: sequelize.QueryTypes.SELECT })
+        .then(data => {
+            if (data[0].username == username && data[0].password == password) {
+                return next();
+            }
+        }).catch(e => {
+            return res.status(404).json({ error: "User or password invalid", e })
+        })
+}
+//Login users
+app.post("/users/login", validateUser, (req,res) => {
+    const {username,password} = req.body;
+    res.json({status: "Authentification"});
+})
 //CRUD users
 //Get query users
 app.get("/users", (req, res) => {
