@@ -1,12 +1,19 @@
 const sequelize = require("sequelize");
 const express = require("express");
+const jwt = require("jsonwebtoken");
+const information = {name: "Delilah"};
+const signature = "password_extra_secret";
+const token = jwt.sign(information,signature);
+console.log(token);
+const decode = jwt.verify(token,signature);
+console.log(decode);
 const dataBase = new sequelize("mysql://root:@localhost:3306/delilahresto");
 const app = express();
 app.use(express.json());
 //CRUD users
 //Get query users
 app.get("/users", (req, res) => {
-    const query = "SELECT * FROM users";
+    const query = "SELECT users.*, roles.rol FROM users JOIN roles ON roles.id = users.code_rol";
     dataBase.query(query, { type: sequelize.QueryTypes.SELECT })
         .then((users) => {
             res.json(users);
@@ -15,14 +22,14 @@ app.get("/users", (req, res) => {
 })
 //Post query users
 app.post("/users", (req, res) => {
-    const query = "INSERT INTO users (id,username,email,name,phone,password,address) VALUES (?,?,?,?,?,?,?)";
-    const { id, username, email, name, phone, password, address } = req.body;
-    dataBase.query(query, { replacements: [id, username, email, name, phone, password, address] })
+    const query = "INSERT INTO users (id,code_rol,username,email,name,phone,password,address) VALUES (?,?,?,?,?,?,?,?)";
+    const { id,code_rol,username, email, name, phone, password, address } = req.body;
+    dataBase.query(query, { replacements: [id, code_rol, username, email, name, phone, password, address] })
         .then((response) => {
             res.json({ status: "User created", user: req.body });
         }).catch((e) => console.error(e));
 })
-//Middleware exist user
+//Middleware exist user 
 const userExist = (req, res, next) => {
     const username = req.query.username;
     const exist = "SELECT * FROM users WHERE username = ?";
@@ -37,7 +44,7 @@ const userExist = (req, res, next) => {
         })
 }
 //Delete users
-app.delete("/users", userExist, (req, res) => {
+app.delete("/users",userExist, (req, res) => {
     const username = req.query.username;
     const query = "DELETE FROM users WHERE username = ?";
     dataBase.query(query, { replacements: [username] })
@@ -132,5 +139,14 @@ app.put("/orders",(req,res) => {
     .then((data) => {
         res.json({status: "Order status update successful"});
     }).catch((e) => console.log(e));
+})
+//Delete existing order ---> Admin <---
+app.delete("/orders", (req,res) => {
+    const id = req.query.id;
+    const query = "DELETE FROM orders WHERE id = ?";
+    dataBase.query(query, {replacements: [id]})
+        .then((data) => {
+            res.status(404).json({status:"Order deleted"});
+        }).catch(e => console.log("Something went wrong ...",(e)));
 })
 app.listen(4000, (res, req) => console.log("Listening in the port 4000"));
