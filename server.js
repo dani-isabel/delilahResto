@@ -16,17 +16,34 @@ const validateUser = (req, res, next) => {
     const exist = "SELECT * FROM users WHERE username = ? AND password = ?";
     dataBase.query(exist, { replacements: [username,password], type: sequelize.QueryTypes.SELECT })
         .then(data => {
+            console.log(data);
             if (data[0].username == username && data[0].password == password) {
                 return next();
             }
         }).catch(e => {
-            return res.status(404).json({ error: "User or password invalid", e })
+            return res.status(404).json({ error: "User or password invalid"})
         })
 }
 //Login users
-app.post("/users/login", validateUser, (req,res) => {
-    const {username,password} = req.body;
-    res.json({status: "Authentification"});
+app.post("/login", validateUser, (req,res) => {
+    res.json({token});
+})
+//Middleware authentication users
+const authenticateUser = (req,res,next) => {
+    try {
+            const loginToken = req.headers.authorization.split(" ")[1];
+            const tokenVerification = jwt.verify(loginToken,signature);
+            if(tokenVerification) {
+                req.query.username = tokenVerification;
+                return next();
+            }
+        } catch(e) {
+            res.json({ error: "User or password invalid"})
+        }
+     };
+//Users authentication
+app.post("/secure",authenticateUser,(req,res) => {
+    res.send(`This is an authenticate webpage. Welcome ${req.query.username}`)
 })
 //CRUD users
 //Get query users
