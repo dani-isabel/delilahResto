@@ -1,6 +1,7 @@
 const sequelize = require("sequelize");
 const express = require("express");
 const jwt = require("jsonwebtoken");
+const cors = require('cors');
 const information = {name: "Delilah"};
 const signature = "password_extra_secret";
 const token = jwt.sign(information,signature);
@@ -10,6 +11,7 @@ console.log(decode);
 const dataBase = new sequelize("mysql://root:@localhost:3306/delilahresto");
 const app = express();
 app.use(express.json());
+app.use(cors());
 //Validate user and password 
 const validateUser = (req, res, next) => {
     const {username,password} = req.body;
@@ -43,7 +45,7 @@ const authenticateUser = (req,res,next) => {
      };
 //Users authentication
 app.post("/secure",authenticateUser,(req,res) => {
-    res.send(`This is an authenticate webpage. Welcome ${req.query.username}`)
+    res.send(`This is an authenticate webpage. ¡Welcome!`)
 })
 //CRUD users
 //Get query users
@@ -98,7 +100,7 @@ app.put("/users", userExist, (req, res) => {
         }).catch((e) => console.error(e));
 })
 //Get dishes
-app.get("/dishes", (req, res) => {
+app.get("/dishes",authenticateUser, (req, res) => {
     const dishes = "SELECT * FROM dishes";
     dataBase.query(dishes, { type: sequelize.QueryTypes.SELECT })
         .then((dishes) => {
@@ -157,9 +159,9 @@ app.get("/orders", (req,res) => {
         }).catch((e) => console.log(e));
 })
 //Create new orders
-app.post("/orders",userExist, (req,res) => {
-    const query = "INSERT INTO orders (id,code_status,hour,dishes,total,id_user) VALUES (?,?,?,?,?,?)";
-    const {id,code_status,hour,dishes,total,id_user} = req.body;
+app.post("/orders",authenticateUser, (req,res) => {
+    const query = "INSERT INTO orders (id,code_status,hour,dishes,total,id_user) VALUES (?,1,?,?,?,?)";
+    const {id,hour,dishes,total,id_user} = req.body;
     dataBase.query(query, {replacements: [id,code_status,hour,dishes,total,id_user]})
         .then((data) => {
             res.json({status: "Order created", order:req.body});
