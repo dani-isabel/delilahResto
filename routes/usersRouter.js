@@ -17,13 +17,14 @@ router.get("/", (req, res) => {
         .catch((e) => console.log(e));
 })
 router.post("/login",(req, res) => {
+    const email = req.query.email;
     const username = req.query.username;
     const password = req.query.password;
-    const exist = "SELECT * FROM users WHERE username = ? AND password = ?";
-    dataBase.query(exist, { replacements: [username,password], type: sequelize.QueryTypes.SELECT })
+    const exist = "SELECT * FROM users WHERE (username = ? OR email = ?) AND password = ?";
+    dataBase.query(exist, { replacements: [username,email,password], type: sequelize.QueryTypes.SELECT })
         .then(data => {
             console.log(data);
-            if (data[0].username == username && data[0].password == password) {
+            if (data[0].username == username || data[0].email == email && data[0].password == password) {
                 res.json({token});
             }
         }).catch(e => {

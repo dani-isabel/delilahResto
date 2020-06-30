@@ -17,6 +17,7 @@ router.post("/", (req,res) => {
     const {hour,dishes,total,id_user} = req.body;
     dataBase.query(query, {replacements: [hour,dishes,total,id_user]})
         .then((data) => {
+            console.log(data[0]);
             res.json({status: "Order created", order:req.body});
         }).catch((e) => console.log(e));
 })
