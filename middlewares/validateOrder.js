@@ -1,5 +1,5 @@
 const sequelize = require("sequelize");
-const dataBase = new sequelize("mysql://root:@localhost:3306/delilahresto");
+const dataBase = require("../routes/sequelize");
 
 const insertNew = (req,res,next) => {
     const query = "INSERT INTO orders (code_status,id_paymethod) VALUES (1,?)";

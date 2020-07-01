@@ -1,5 +1,5 @@
 const sequelize = require("sequelize");
-const dataBase = new sequelize("mysql://root:@localhost:3306/delilahresto");
+const dataBase = require("../routes/sequelize");
 
 const dishExist = (req,res,next) => {
     const dish = req.query.dish;

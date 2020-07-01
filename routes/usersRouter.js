@@ -1,11 +1,11 @@
-const sequelize = require("sequelize");
 const express = require("express");
+const sequelize = require("sequelize");
 const middlewares = require("../middlewares/validateUser");
 const jwt = require("jsonwebtoken");
 const information = { name: "Delilah" };
 const signature = "password_extra_secret";
 const token = jwt.sign(information, signature);
-const dataBase = new sequelize("mysql://root:@localhost:3306/delilahresto");
+const dataBase = require("./sequelize");
 const router = express.Router();
 
 router.get("/", (req, res) => {

@@ -1,6 +1,6 @@
 const sequelize = require("sequelize");
 const express = require("express");
-const dataBase = new sequelize("mysql://root:@localhost:3306/delilahresto");
+const dataBase = require("./sequelize");
 const middlewares = require("../middlewares/validateDish");
 const router = express.Router();
 
