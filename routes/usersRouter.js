@@ -2,9 +2,7 @@ const express = require("express");
 const sequelize = require("sequelize");
 const middlewares = require("../middlewares/validateUser");
 const jwt = require("jsonwebtoken");
-const information = { name: "Delilah" };
 const signature = "password_extra_secret";
-const token = jwt.sign(information, signature);
 const dataBase = require("./sequelize");
 const router = express.Router();
 
@@ -25,9 +23,11 @@ router.post("/login",(req, res) => {
         .then(data => {
             console.log(data);
             if (data[0].username == username || data[0].email == email && data[0].password == password) {
-                res.json({token});
-            }
-        }).catch(e => {
+                const rol = data[0].code_rol;
+                const playload = {email,rol};
+                const token = jwt.sign(playload, signature,{expiresIn:1440});
+                res.json(token);
+        }}).catch(e => {
             return res.status(400).json({ error: "User or password invalid"})
         })
 })
