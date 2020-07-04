@@ -1,5 +1,7 @@
 const sequelize = require("sequelize");
 const dataBase = require("../routes/sequelize");
+const jwt = require("jsonwebtoken");
+const signature = "password_extra_secret";
 
 const userExist = (req, res, next) => {
     const username = req.query.username;
@@ -15,15 +17,32 @@ const userExist = (req, res, next) => {
         })
 };
 const authenticateUser = (req,res,next) => {
+    const loginToken = req.headers.authorization.split(" ")[1];
+    const token = jwt.verify(loginToken,signature);
     try {
-            const loginToken = req.headers.authorization.split(" ")[1];
-            const tokenVerification = jwt.verify(loginToken,signature);
-            if(tokenVerification) {
-                req.query.username = tokenVerification;
+            if(token) {
+                const username = token.username;
+                const email = token.email;
+                const rol = token.rol;
+                req.username = username;
+                req.email = email;
+                req.rol = rol;
                 return next();
             }
         } catch(e) {
             res.status(400).json({ error: "User or password invalid"})
         }
      };
-module.exports = {userExist,authenticateUser}
+const authenticateAdmin = (req,res,next) => {
+    const {rol} = req;
+    console.log(rol);
+    try {
+        if(rol == 2) {
+            return next();
+        }
+        return res.status(401).json({ error: "You don't have permissions"})
+    }catch(e) {
+        return res.status(400).json({ error: "Something went wrong..."})
+    }
+};
+module.exports = {userExist,authenticateUser,authenticateAdmin}

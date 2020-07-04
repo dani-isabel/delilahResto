@@ -6,7 +6,7 @@ const signature = "password_extra_secret";
 const dataBase = require("./sequelize");
 const router = express.Router();
 
-router.get("/", (req, res) => {
+router.get("/", middlewares.authenticateUser,middlewares.authenticateAdmin,(req, res) => {
     const query = "SELECT users.*, roles.rol FROM users JOIN roles ON roles.id = users.code_rol";
     dataBase.query(query, { type: sequelize.QueryTypes.SELECT })
         .then((users) => {
@@ -24,7 +24,7 @@ router.post("/login",(req, res) => {
             console.log(data);
             if (data[0].username == username || data[0].email == email && data[0].password == password) {
                 const rol = data[0].code_rol;
-                const playload = {email,rol};
+                const playload = {username,email,rol};
                 const token = jwt.sign(playload, signature,{expiresIn:1440});
                 res.json(token);
         }}).catch(e => {
