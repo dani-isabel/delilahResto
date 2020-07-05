@@ -15,10 +15,10 @@ router.get("/", (req, res) => {
             res.json(data);
         }).catch((e) => console.log(e));
 })
-router.post("/", orders.insertNew, orders.insertDishes, (req, res) => {
+router.post("/", orders.validatePaymethod, orders.insertNew, orders.insertDishes, (req, res) => {
     res.json({ status: "Order created", order: req.body });
 })
-router.put("/",middlewaresUser.authenticateAdmin, (req, res) => {
+router.put("/",middlewaresUser.authenticateAdmin,orders.orderExist,orders.validateStatus, (req, res) => {
     const id = req.query.id;
     const query = "UPDATE orders SET code_status = ? WHERE id = ?";
     const { code_status } = req.body;
@@ -27,7 +27,7 @@ router.put("/",middlewaresUser.authenticateAdmin, (req, res) => {
             res.json({ status: "Order status update successful" });
         }).catch((e) => console.log(e));
 })
-router.delete("/",middlewaresUser.authenticateAdmin, (req, res) => {
+router.delete("/",middlewaresUser.authenticateAdmin,orders.orderExist, (req, res) => {
     const id = req.query.id;
     const query = "DELETE FROM orders WHERE id = ?";
     dataBase.query(query, { replacements: [id] })

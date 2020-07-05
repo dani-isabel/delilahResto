@@ -25,4 +25,31 @@ const insertDishes = (req,res,next) => {
         }).catch((e) => console.log(e))
     }
 }
-module.exports = {insertDishes, insertNew}
+const orderExist = (req, res, next) => {
+    const id = req.query.id;
+    const exist = "SELECT * FROM orders WHERE id = ? ";
+    dataBase.query(exist, { replacements: [id], type: sequelize.QueryTypes.SELECT })
+        .then(data => {
+            if (!data.length) {
+                return res.status(404).json({ error: "Order doesn't already exist" })
+            }
+            return next();
+        }).catch(e => {
+            return res.status(500).json({ error: "Something went wrong...", e })
+        })
+};
+const validateStatus = (req, res, next) => {
+    const { code_status } = req.body;
+            if (code_status > 0 && code_status <= 4) {
+                return next();
+            }
+            return res.status(404).json({ error: "This status doesn't exist"})
+};
+const validatePaymethod = (req, res, next) => {
+    const { id_paymethod } = req.body;
+            if (id_paymethod > 0 && id_paymethod <= 4) {
+                return next();
+            }
+            return res.status(404).json({ error: "This pay method doesn't exist"})
+};
+module.exports = {insertDishes, insertNew, orderExist,validateStatus,validatePaymethod}
