@@ -3,8 +3,10 @@ const sequelize = require("sequelize");
 const dataBase = require("./sequelize");
 const orders = require("../middlewares/validateOrder");
 const dishes = require("../middlewares/validateDish");
+const middlewaresUser = require("../middlewares/validateUser");
 const router = express.Router();
 
+router.use(middlewaresUser.authenticateUser);
 router.get("/", (req, res) => {
     const orders =
         "SELECT orders.*, status.state, users.name, users.address, dishes.dish, dishes.price, group.concat(orders.description.id_dishes separator), as orders.dishes FROM orders JOIN status ON status.id = orders.code_status JOIN users ON users.id = orders.id_user JOIN orders.description ON dishes.id = orders.dishes";
@@ -16,7 +18,7 @@ router.get("/", (req, res) => {
 router.post("/", orders.insertNew, orders.insertDishes, (req, res) => {
     res.json({ status: "Order created", order: req.body });
 })
-router.put("/", (req, res) => {
+router.put("/",middlewaresUser.authenticateAdmin, (req, res) => {
     const id = req.query.id;
     const query = "UPDATE orders SET code_status = ? WHERE id = ?";
     const { code_status } = req.body;
@@ -25,7 +27,7 @@ router.put("/", (req, res) => {
             res.json({ status: "Order status update successful" });
         }).catch((e) => console.log(e));
 })
-router.delete("/", (req, res) => {
+router.delete("/",middlewaresUser.authenticateAdmin, (req, res) => {
     const id = req.query.id;
     const query = "DELETE FROM orders WHERE id = ?";
     dataBase.query(query, { replacements: [id] })

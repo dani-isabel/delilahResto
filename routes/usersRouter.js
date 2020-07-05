@@ -39,20 +39,22 @@ router.post("/", (req, res) => {
             res.json({ status: "User created", user: req.body });
         }).catch((e) => console.error(e));
 })
-router.put("/",middlewares.userExist, (req, res) => {
-    const username = req.query.username;
-    const query = "UPDATE users SET email = ?,phone = ?,password = ?,address = ? WHERE username = ?";
-    const { email, phone, password, address } = req.body;
-    dataBase.query(query, { replacements: [email, phone, password, address, username] })
+router.put("/", middlewares.authenticateUser,middlewares.userExist, (req, res) => {
+    const {username} = req;
+    const {email} = req;
+    const query = "UPDATE users SET phone = ?,password = ?,address = ? WHERE username = ? OR email = ?";
+    const { phone, password, address } = req.body;
+    dataBase.query(query, { replacements: [phone, password, address, username, email] })
         .then((response) => {
             res.json({ status: "User updated successful" });
         }).catch((e) => console.error(e));
 })
-router.delete("/", (req, res) => {
-    const username = req.query.username;
-    const query = "DELETE FROM users WHERE username = ?";
-    dataBase.query(query, { replacements: [username] })
-        .then((data) => {
+router.delete("/",middlewares.authenticateUser,middlewares.userExist, (req, res) => {
+    const {username} = req;
+    const {email} = req;
+    const query = "DELETE FROM users WHERE username = ? OR email = ?";
+    dataBase.query(query, { replacements: [username,email] })
+        .then(() => {
             res.json({ status: "User delete" });
         }).catch(e => console.log("Something went wrong...", e));
 });

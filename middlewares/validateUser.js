@@ -4,9 +4,10 @@ const jwt = require("jsonwebtoken");
 const signature = "password_extra_secret";
 
 const userExist = (req, res, next) => {
-    const username = req.query.username;
-    const exist = "SELECT * FROM users WHERE username = ?";
-    dataBase.query(exist, { replacements: [username], type: sequelize.QueryTypes.SELECT })
+    const {username} = req;
+    const {email} = req;
+    const exist = "SELECT * FROM users WHERE username = ? OR email = ?";
+    dataBase.query(exist, { replacements: [username,email], type: sequelize.QueryTypes.SELECT })
         .then(data => {
             if (!data.length) {
                 return res.status(404).json({ error: "User is not register" })
@@ -35,7 +36,6 @@ const authenticateUser = (req,res,next) => {
      };
 const authenticateAdmin = (req,res,next) => {
     const {rol} = req;
-    console.log(rol);
     try {
         if(rol == 2) {
             return next();
