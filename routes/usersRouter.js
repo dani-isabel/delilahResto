@@ -4,6 +4,7 @@ const middlewares = require("../middlewares/validateUser");
 const jwt = require("jsonwebtoken");
 const signature = "password_extra_secret";
 const dataBase = require("./sequelize");
+const { userRepeat } = require("../middlewares/validateUser");
 const router = express.Router();
 
 router.get("/", middlewares.authenticateUser,middlewares.authenticateAdmin,(req, res) => {
@@ -24,14 +25,15 @@ router.post("/login",(req, res) => {
             console.log(data);
             if (data[0].username == username || data[0].email == email && data[0].password == password) {
                 const rol = data[0].code_rol;
-                const playload = {username,email,rol};
+                const id = data[0].id;
+                const playload = {id,username,email,rol};
                 const token = jwt.sign(playload, signature,{expiresIn:1440});
                 res.json(token);
         }}).catch(e => {
             return res.status(400).json({ error: "User or password invalid"})
         })
 })
-router.post("/", (req, res) => {
+router.post("/",middlewares.userRepeat, (req, res) => {
     const query = "INSERT INTO users (code_rol,username,email,name,phone,password,address) VALUES (1,?,?,?,?,?,?)";
     const { username, email, name, phone, password, address } = req.body;
     dataBase.query(query, { replacements: [username, email, name, phone, password, address] })
@@ -49,7 +51,7 @@ router.put("/", middlewares.authenticateUser,middlewares.userExist, (req, res) =
             res.json({ status: "User updated successful" });
         }).catch((e) => console.error(e));
 })
-router.delete("/",middlewares.authenticateUser,middlewares.userExist, (req, res) => {
+router.delete("/",middlewares.authenticateUser,middlewares.authenticateAdmin,middlewares.userExist, (req, res) => {
     const {username} = req;
     const {email} = req;
     const query = "DELETE FROM users WHERE username = ? OR email = ?";

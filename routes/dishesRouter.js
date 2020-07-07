@@ -14,9 +14,9 @@ router.get("/", (req, res) => {
         }).catch((e) => console.log(e));
 })
 router.post("/", middlewaresUser.authenticateAdmin,middlewares.dishRepeat, (req, res) => {
-    const query = "INSERT INTO dishes (id,dish,price) VALUES (?,?,?)";
-    const { id, dish, price } = req.body;
-    dataBase.query(query, { replacements: [id, dish, price] })
+    const query = "INSERT INTO dishes (dish,price) VALUES (?,?)";
+    const { dish, price } = req.body;
+    dataBase.query(query, { replacements: [dish, price] })
         .then ((response) => {
             res.json({status: "Dish created", user: req.body });
         }). catch((e) => console.log(e));

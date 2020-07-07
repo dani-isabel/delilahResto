@@ -9,7 +9,7 @@ const router = express.Router();
 router.use(middlewaresUser.authenticateUser);
 router.get("/", (req, res) => {
     const orders =
-        "SELECT orders.*, status.state, users.name, users.address, dishes.dish, dishes.price, group.concat(orders.description.id_dishes separator), as orders.dishes FROM orders JOIN status ON status.id = orders.code_status JOIN users ON users.id = orders.id_user JOIN orders.description ON dishes.id = orders.dishes";
+        "SELECT orders.*, status.state, users.name, users.address, dishes.price, group_concat(dishes.dish separator ','), as orders.dishes FROM orders JOIN status ON status.id = orders.code_status JOIN users ON users.id = orders.id_user JOIN orders.description ON dishes.id = orders.dishes";
     dataBase.query(orders, { type: sequelize.QueryTypes.SELECT })
         .then((data) => {
             res.json(data);
