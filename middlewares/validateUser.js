@@ -43,7 +43,7 @@ const authenticateUser = (req,res,next) => {
                 const username = token.username;
                 const email = token.email;
                 const rol = token.rol;
-                const id = token.rol
+                const id = token.id;
                 req.username = username;
                 req.email = email;
                 req.rol = rol;

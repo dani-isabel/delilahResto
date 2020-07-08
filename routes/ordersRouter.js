@@ -6,13 +6,25 @@ const dishes = require("../middlewares/validateDish");
 const middlewaresUser = require("../middlewares/validateUser");
 const router = express.Router();
 
-router.use(middlewaresUser.authenticateUser);
-router.get("/", (req, res) => {
+router.use(middlewaresUser.authenticateUser,);
+router.get("/",middlewaresUser.authenticateAdmin,(req, res) => {
     const orders =
-        "SELECT orders.*, status.state, users.name, users.address, dishes.price, group_concat(dishes.dish separator ','), as orders.dishes FROM orders JOIN status ON status.id = orders.code_status JOIN users ON users.id = orders.id_user JOIN orders.description ON dishes.id = orders.dishes";
+    "SELECT  status.state, orders.hour, orders.id, GROUP_CONCAT(dishes.dish SEPARATOR ', ') AS description, pay.method,SUM(dishes.price) AS total, users.name, users.address FROM orders orders JOIN status status ON orders.code_status = status.id JOIN users users ON orders.id_user= users.id JOIN pay_methods pay ON orders.id_paymethod = pay.id JOIN orders_description orders_description ON orders.id = orders_description.id_order JOIN dishes dishes ON orders_description.id_dishes = dishes.id GROUP BY orders.id";
     dataBase.query(orders, { type: sequelize.QueryTypes.SELECT })
         .then((data) => {
             res.json(data);
+        }).catch((e) => console.log(e));
+})
+router.get("/myOrders",(req, res) => {
+    const {id,rol} = req;
+    if(rol === 2){
+        res.redirect('/orders/')
+    }
+    const orders =
+    "SELECT  status.state, orders.hour, orders.id, GROUP_CONCAT(dishes.dish SEPARATOR ', ') AS description, pay.method,SUM(dishes.price) AS total, users.name, users.address FROM orders orders JOIN status status ON orders.code_status = status.id JOIN users users ON orders.id_user= users.id JOIN pay_methods pay ON orders.id_paymethod = pay.id JOIN orders_description orders_description ON orders.id = orders_description.id_order JOIN dishes dishes ON orders_description.id_dishes = dishes.id WHERE users.id = ? GROUP BY orders.id";
+    dataBase.query(orders, {replacements: [id]})
+        .then((data) => {
+            res.json(data[0]);
         }).catch((e) => console.log(e));
 })
 router.post("/", orders.validatePaymethod, orders.insertNew, orders.insertDishes, (req, res) => {

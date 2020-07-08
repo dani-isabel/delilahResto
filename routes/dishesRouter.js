@@ -22,18 +22,18 @@ router.post("/", middlewaresUser.authenticateAdmin,middlewares.dishRepeat, (req,
         }). catch((e) => console.log(e));
 })
 router.delete("/",middlewaresUser.authenticateAdmin, middlewares.dishExist, (req,res) => {
-    const dish = req.query.dish;
-    const query = "DELETE FROM dishes WHERE dish = ? ";
-    dataBase.query(query, {replacements: [dish]})
+    const id = req.query.id;
+    const query = "DELETE FROM dishes WHERE id = ? ";
+    dataBase.query(query, {replacements: [id]})
         .then ((data) => {
             res.status(404).json({ status: "Dish delete"});
         }).catch(e => console.log("Something went wrong ...", (e)));
 })
 router.put("/",middlewaresUser.authenticateAdmin, middlewares.dishExist, (req,res) => {
-    const dish = req.query.dish;
-    const query = "UPDATE dishes SET price = ? WHERE dish = ?";
-    const {price} = req.body;
-    dataBase.query(query, {replacements: [price,dish]})
+    const id = req.query.id;
+    const query = "UPDATE dishes SET dish = ?, price = ? WHERE id = ?";
+    const {dish,price} = req.body;
+    dataBase.query(query, {replacements: [dish,price,id]})
     .then ((response) => {
         res.json({status: "Dish update successful"});
     }).catch((e) => console.error(e))

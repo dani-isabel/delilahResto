@@ -2,12 +2,12 @@ const sequelize = require("sequelize");
 const dataBase = require("../routes/sequelize");
 
 const dishExist = (req,res,next) => {
-    const dish = req.query.dish;
-    const existDish = "SELECT * FROM dishes WHERE dish = ?";
-    dataBase.query(existDish, {replacements: [dish], type: sequelize.QueryTypes.SELECT})
+    const id = req.query.id;
+    const existDish = "SELECT * FROM dishes WHERE id = ?";
+    dataBase.query(existDish, {replacements: [id], type: sequelize.QueryTypes.SELECT})
         .then(data => {
             if (!data.length) {
-                return res.status(404).json({dish: "Dish is not register"});
+                return res.status(404).json({error: "Dish is not register"});
             }
             return next();
         }).catch(e => {
