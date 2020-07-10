@@ -10,7 +10,7 @@ router.get("/", (req, res) => {
     const dishes = "SELECT * FROM dishes";
     dataBase.query(dishes, { type: sequelize.QueryTypes.SELECT })
         .then((dishes) => {
-            res.json(dishes);
+            res.status(200).res.json(dishes);
         }).catch((e) => console.log(e));
 })
 router.post("/", middlewaresUser.authenticateAdmin,middlewares.dishRepeat, (req, res) => {

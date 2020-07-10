@@ -10,11 +10,11 @@ const userExist = (req, res, next) => {
     dataBase.query(exist, { replacements: [username,email], type: sequelize.QueryTypes.SELECT })
         .then(data => {
             if (!data.length) {
-                return res.status(404).json({ error: "User is not register" })
+                return res.status(404).json({ error: "User not found" })
             }
             return next();
         }).catch(e => {
-            return res.status(404).json({ error: "User not found", e })
+            return res.status(400).json({ error: "Something went wrong...", e })
         })
 };
 const userRepeat = (req, res, next) => {

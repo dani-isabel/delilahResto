@@ -2,7 +2,6 @@ const express = require("express");
 const sequelize = require("sequelize");
 const dataBase = require("./sequelize");
 const orders = require("../middlewares/validateOrder");
-const dishes = require("../middlewares/validateDish");
 const middlewaresUser = require("../middlewares/validateUser");
 const router = express.Router();
 

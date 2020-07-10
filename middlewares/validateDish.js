@@ -11,7 +11,7 @@ const dishExist = (req,res,next) => {
             }
             return next();
         }).catch(e => {
-            return res.status(404).json({error: "Something went wrong..."}) 
+            return res.status(400).json({error: "Something went wrong..."}) 
         })
 }
 const dishRepeat = (req,res,next) => {
@@ -22,9 +22,9 @@ const dishRepeat = (req,res,next) => {
             if (!data.length) {
                 return next();
             }
-            return res.status(200).json({dish: "Dish is already register"});
+            return res.status(404).json({dish: "Dish is already register"});
         }).catch(e => {
-            return res.status(404).json({error: "Something went wrong..."}) 
+            return res.status(400).json({error: "Something went wrong..."}) 
         })
 }
 module.exports = {dishExist,dishRepeat}

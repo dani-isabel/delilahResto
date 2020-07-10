@@ -4,8 +4,6 @@ const dataBase = require("../routes/sequelize");
 const insertNew = (req,res,next) => {
     const query = "INSERT INTO orders (code_status,id_user,id_paymethod) VALUES (1,?,?)";
     const {id} = req;
-    console.log(id)
-    //const id_user = id;
     const {id_paymethod} = req.body;
     dataBase.query(query, {replacements: [id,id_paymethod]})
         .then((data) => {
