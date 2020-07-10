@@ -4,7 +4,6 @@ const middlewares = require("../middlewares/validateUser");
 const jwt = require("jsonwebtoken");
 const signature = "password_extra_secret";
 const dataBase = require("./sequelize");
-const { userRepeat } = require("../middlewares/validateUser");
 const router = express.Router();
 
 router.get("/", middlewares.authenticateUser,middlewares.authenticateAdmin,(req, res) => {

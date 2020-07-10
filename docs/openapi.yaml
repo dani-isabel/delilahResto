@@ -1,0 +1,552 @@
+openapi: 3.0.0
+info:
+  title: Delilah Resto
+  description: This is an REST API to provide delivery food services managing users, dishes and orders
+  version: 1.0.0
+tags:
+  - name: users
+    description: users operations
+servers:
+- url: https://localhost:4000
+  description: Localhost
+- url: https://staging.gigantic-server.com/v1
+  description: Staging server
+paths:
+  /users:
+    post:
+      tags:
+      - users
+      summary: Crete a new user
+      operationId: createUsersWithArrayInput
+      requestBody:
+        description: List of user object
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        200:
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        404:
+          description: Username isn't available
+          content: {}
+    get:
+      tags:
+      - users
+      summary: Returns all users
+      description: Only an admin can access to all the users register in the platform
+      operationId: getUsers
+      parameters:
+      - name: security
+        in: header
+        description: Token of login session
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        400:
+          description: You don't have permissions
+          content: {}
+        401:
+          description: Token expired. Login again
+          content: {}
+      security:
+        - authorization: 
+          - "write:users"
+    put:
+      tags:
+      - users
+      summary: Update an existing user
+      operationId: updateUser
+      requestBody:
+        description: Update information of login user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+        required: true
+      responses:
+        404:
+          description: User not found
+          content: {}
+        401:
+          description: Token expired. Login again
+          content: {}
+        400:
+          description: User or password invalid
+          content: {}
+      security:
+        - authorization: 
+          - "write:users"
+    delete:
+      tags:
+      - users
+      summary: Deletes an user
+      operationId: deleteUser
+      parameters:
+      - name: security
+        in: header
+        schema:
+          type: string
+      responses:
+        200:
+          description: User delete
+          content: {}
+        404:
+          description: User not found
+          content: {}
+        400:
+          description: User or password invalid
+          content: {}
+      security:
+        - authorization: 
+          - "write:users"
+  /users/login:
+    post:
+      tags:
+      - users
+      summary: Login into the system
+      description: For login sesion you need to enter a valid username or email and password
+      operationId: getToken
+      parameters:
+      - name: user
+        in: header
+        description: The valid username or email for login
+        required: true
+        schema:
+          type: integer
+          format: string
+      - name: password
+        in: query
+        description: The password for login
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              schema:
+                type: integer
+                format: int32
+            X-Expires-After:
+              description: date in UTC when token expires
+              schema:
+                type: string
+                format: date-time
+          content:
+            application/json:
+              schema:
+                type: string
+            application/xml:
+              schema:
+                type: string
+        400:
+          description: User or password invalid
+          content: {}
+  /dishes:
+    post:
+      tags:
+      - dishes
+      summary: Crete a new dish
+      operationId: createDish
+      requestBody:
+        description: List of dish object
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Dish'
+        required: true
+      responses:
+        200:
+          description: Dish created successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dish'
+        404:
+          description: Dish is already register
+          content: {}
+        400:
+          description: You don't have permissions
+          content: {}
+        401:
+          description: Token expired. Login again
+          content: {}
+      security:
+        - authorization: 
+          - "write:dishes"
+    get:
+      tags:
+      - dishes
+      summary: Returns all dishes
+      description: The users can access to all the available dishes
+      operationId: getDishes
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dish'
+        400:
+          description: User or password invalid
+          content: {}
+        401:
+          description: Token expired. Login again
+          content: {}
+      security:
+        - authorization: 
+          - "write:dishes"
+  /dishes/{id}:
+    put:
+      tags:
+      - dishes
+      summary: Update an existing dish
+      operationId: updateDish
+      parameters:
+      - name: id
+        in: path
+        description: ID of dish that needs to be update
+        required: true
+        schema:
+          maximum: 10
+          minimum: 1
+          type: integer
+          format: int64
+      requestBody:
+        description: Dish object that needs to be update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DishUpdate'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/DishUpdate'
+        required: true
+      responses:
+        400:
+          description: You don't have permissions
+          content: {}
+        404:
+          description: Dish is not register
+          content: {}
+        401:
+          description: Token expired. Login again
+          content: {}
+      security:
+        - authorization: 
+          - "write:dishes"
+    delete:
+      tags:
+      - dishes
+      summary: Delete a dish
+      operationId: deleteDish
+      parameters:
+      - name: id
+        in: path
+        description: ID of dish that needs to be delete
+        required: true
+        schema:
+          maximum: 10
+          minimum: 1
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: Dish delete
+          content: {}
+        400:
+          description: You don't have permissions
+          content: {}
+        404:
+          description: Dish is not register
+          content: {}
+        401:
+          description: Token expired. Login again
+          content: {}
+      security:
+        - authorization: 
+          - "write:dishes"
+  /orders:
+    post:
+      tags:
+      - orders
+      summary: Crete a new order
+      operationId: createOrder
+      requestBody:
+        description: List of order object
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/OrderNew'
+        required: true
+      responses:
+        '200':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderNew'
+        '404':
+          description: User name isn't available
+          content: {}
+        '400':
+          description: User or password invalid
+          content: {}
+      security:
+        - authorization: 
+          - "write:orders"
+    get:
+      tags:
+      - orders
+      summary: Returns all the orders
+      description: Only an admin can access to all the orders existing in the platform
+      operationId: getOrders
+      parameters:
+      - name: security
+        in: header
+        description: Token of login session
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+        400:
+          description: You don't have permissions
+          content: {}
+        401:
+          description: Token expired. Login again
+          content: {}
+      security:
+        - authorization: 
+          - "write:orders"
+  /orders/{id}:
+    put:
+      tags:
+      - orders
+      summary: Update only the status of an existing order
+      operationId: updateOrder
+      parameters:
+      - name: id
+        in: path
+        description: ID of order that needs to be update
+        required: true
+        schema:
+          maximum: 10
+          minimum: 1
+          type: integer
+          format: int64
+      requestBody:
+        description: Status order object that needs to be update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusOrder'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/StatusOrder'
+        required: true
+      responses:
+        200:
+          description: Order status update successfuly
+          content: {}
+        400:
+          description: You don't have permissions
+          content: {}
+        404:
+          description: Order is not register or status invalid
+          content: {}
+        401:
+          description: Token expired. Login again
+          content: {}
+      security:
+        - authorization: 
+          - "write:orders"
+    delete:
+      tags:
+      - orders
+      summary: Delete an order
+      operationId: deleteOrder
+      parameters:
+      - name: id
+        in: path
+        description: ID of order that needs to be deleted
+        required: true
+        schema:
+          maximum: 10
+          minimum: 1
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: Order deleted
+          content: {}
+        400:
+          description: You don't have permissions
+          content: {}
+        404:
+          description: Order is not register
+          content: {}
+        401:
+          description: Token expired. Login again
+          content: {}
+      security:
+        - authorization: 
+          - "write:orders"  
+components:
+    schemas:
+      User:
+        type: object
+        properties:
+          username:
+            type: string
+            format: char20
+          email:
+            type: string
+            format: varchar60
+          name:
+            type: string
+            format: varchar60
+          phone:
+            type: number
+            format: int
+          password:
+            type: string
+            format: password
+          address:
+            type: string
+            format: varchar60
+      UserUpdate:
+        type: object
+        properties:
+          phone:
+            type: number
+            format: int
+          password:
+            type: string
+            format: password
+          address:
+            type: string
+            format: varchar60
+      Dish:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int
+          dish:
+            type: string
+            format: varchar60
+          price:
+            type: number
+            format: int
+      DishUpdate:
+        type: object
+        properties:
+          dish:
+            type: string
+            format: varchar60
+          price:
+            type: number
+            format: int
+      Order:
+        type: object
+        properties:
+          state:
+            type: string
+            format: char20
+          hour:
+            type: string
+            format: time
+          id:
+            type: integer
+            format: int
+          description:
+            type: string
+            format: varchar60
+          method:
+            type: string
+            format: varchar60
+          total:
+            type: integer
+            format: number
+          name:
+            type: string
+            format: varchar60
+          adress: 
+            type: string
+            format: varchar60
+      OrderNew:
+        type: object
+        properties:
+          dishes:
+            type: string
+            format: array
+          id_paymethod:
+            type: integer
+            format: int
+      StatusOrder:
+        type: object
+        properties:
+          state:
+            type: string
+            format: char20
+    securitySchemes:
+      authorization:
+        type: oauth2
+        flows:
+          implicit:
+            authorizationUrl: https://localhost:4000/users/authorization
+            scopes:
+              write:users: get, delete and update users
+              write:dishes: get, delete, create and update dishes
+              write:orders: update, create and delete orders
+          
+            
