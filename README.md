@@ -82,8 +82,50 @@ If everything is ok you will get the next message:
 - _"Listening in the port 4000"_
 
 **Important note:** Tables and associations were created after did this.
-You can see the model database [here](https://github.com/leidymgdev/delilah-api-rest-nodejs/tree/master/server/docs/db_delilah.png).
+You can see the model database [here](https://github.com/dani-isabel/delilahResto/blob/master/docs/dataModel.pdf).
 
+Execute the next script [delilahresto.sql](https://github.com/dani-isabel/delilahResto/blob/master/delilahresto.sql) in MySQL to insert data in roles, dishes, pay_methods, status, orders, orders_description and users tables.
+
+You can check this in the mysql tables.
+
+**Important note:** This information needs to be inserted before testing all endpoints. **This is a master data.**
+This script can be only executes one time. 
+
+## Testing the API
+
+Use **Postman** or similar apps to try out the CRUD (create, read, update and delete) requests.
+
+**You can [Run in Postman](https://www.getpostman.com/collections/b477bfef05e953d5d07e). (For adding the collection in your windows postman. This contains all endpoints and data body to test/run each endpoint). This will save you work for testing.**
+
+## METHODS
+
+**Important note:** Middlewares check user and admin with a token. To have access to resources with admin privileges, you need to be logged in as a registered admin first. Also there are middlewares to check the existence of some important atributes like: user, dish and order
+
+**Other important note:** Please remember to use JSON for all "body: raw" requests.
+
+## ENDPOINTS
+
+(If you changed the PORT variable in sequelize.js please change it in all endpoints).
+
+## For managing users
+
+### POST - Register a user
+
+http://localhost:4000/users
+
+Request body:
+
+```js
+    {
+        "username": "myUsername",
+        "email": "myEmail.com",
+        "name": "myFullName",
+        "phone":  123456,
+        "password": "myPassword",
+        "address": "myShippingAdress"
+        "rol": 2
+}
+```
 
 
 
