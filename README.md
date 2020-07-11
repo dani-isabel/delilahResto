@@ -126,6 +126,174 @@ Request body:
         "rol": 2
 }
 ```
+(**roleId** is an optional parameter.
+
+- It will be saved with id 1 if the property does not come in the request.
+- Id **2** makes for **admin privileges** and id **1** is for a **normal client**).
+
+### POST - Login of user
+
+localhost:4000/users/login
+
+```params
+    {username} or {email}
+    {password}
+```
+
+This endpoint responses a **token**. This token must be used in the **Authorization** with **Bearer Token** type for others endpoints (in users, products and orders) in **Postman**.
+
+```js
+    {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZUlkIjoxLCJpYXQiOjE1OTM5OTk2MzksImV4cCI6MTU5NDE3MjQzOX0.56790l9gC2FQsjH9uIwKWih7xmgRZA1dlVg4PaZKZic"
+    }
+```
+
+_**Important note:** Example how to send in the **Authorization** the **Bearer Token** token in **Postman**._
+
+![example postman Authorization](https://github.com/dani-isabel/delilahResto/blob/master/docs/exampleToken.png)
+
+### GET - All users
+
+localhost:4000/users
+
+- _You need to send the token in the **Authorization** with **Bearer Token** key_.
+- _You need **admin privileges** via **roleId 2**. This is sent in the token_.
+Admin can see all users in the system.
+
+### PUT - Users
+
+localhost:4000/users/:id
+
+- _You need to send the token in the **Authorization** with **Bearer Token** key_.
+- _You must be login to update the information_.
+- _You can't update your username and email because are used to the login_.
+
+_**Important note:** The id is obtain with the **Token** information._
+
+```js
+    {
+        "email": "alexrosso2@hotmail.com",
+        "phone": 300289,
+        "password": "12345",
+        "address": "Calle Nunca Viva"
+    }
+```
+
+### DELETE - Users
+
+localhost:4000/users/:id
+
+- _You need to send the token in the **Authorization** with **Bearer Token** key_.
+- _You need **admin privileges** via **roleId 2**. This is sent in the token_.
+
+_**Important note:** The id is obtain with the **Token** information._
+
+## For managing dishes
+
+### POST - Dishes
+
+localhost:4000/dishes
+
+- _You need to send the token in the **Authorization** with **Bearer Token** key_.
+- _You need **admin privileges** via **roleId 2**. This is sent in the token_.
+
+```js
+    {
+        "description": "dishName",
+        "price": 10
+    }
+```
+
+### GET - Dishes
+
+localhost:4000/dishes
+
+- _You need to send the token in the **Authorization** with **Bearer Token** key_.
+
+### PUT - Dishes
+
+localhost:4000/dishes/:id
+
+- _You need to send the token in the **Authorization** with **Bearer Token** key_.
+- _You need **admin privileges** via **roleId 2**. This is sent in the token_.
+
+```js
+    {
+        "description": "dishName",
+        "price": 10
+    }
+```
+
+### DELETE - Dishes
+
+localhost:4000/dishes/:id
+
+- _You need to send the token in the **Authorization** with **Bearer Token** key_.
+- _You need **admin privileges** via **roleId 2**. This is sent in the token_.
+
+## For managing orders
+
+## POST - Orders
+
+localhost:4000/orders
+
+- _You need to send the token in the **Authorization** with **Bearer Token** key_.
+
+```js
+    {
+        "dishes": [
+            {
+                "id_dishes": 1,
+            }
+        ],
+        "id_paymethod": 1,
+    }
+```
+
+### GET - All orders
+
+localhost:4000/orders
+
+- _You need to send the token in the **Authorization** with **Bearer Token** key_.
+- _You need **admin privileges** via **roleId 2**. This is sent in the token_.
+Admin can see all orders.
+
+### GET - Only client orders
+
+localhost:4000/orders/myOrders
+
+- _You need to send the token in the **Authorization** with **Bearer Token** key_.
+
+Normal client only can see their orders.
+
+### PUT - Orders (change status)
+
+localhost:4000/orders/:id
+
+This endpoint only update the order status.
+
+- _You need to send the token in the **Authorization** with **Bearer Token** key_.
+- _You need **admin privileges** via **roleId 2**. This is sent in the token_.
+
+```js
+    {
+        "code_status": 2
+    }
+```
+
+### DELETE - Orders
+
+localhost:4000/orders/:id
+
+- _You need to send the token in the **Authorization** with **Bearer Token** key_.
+- _You need **admin privileges** via **roleId 2**. This is sent in the token_.
+
+## Future improvements
+
+- Include bcryptjs package (for encrypt password)
+- Do the front end for the API
+- Include an endpoint for logout sesion
+- Make the connection with UI swagger using swagger-jsdoc and swagger-ui-express
 
 
 
