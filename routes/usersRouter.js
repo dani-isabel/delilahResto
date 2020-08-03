@@ -56,7 +56,7 @@ router.delete("/",middlewares.authenticateUser,middlewares.authenticateAdmin,mid
     const query = "DELETE FROM users WHERE username = ? OR email = ?";
     dataBase.query(query, { replacements: [username,email] })
         .then(() => {
-            res.status(200).res.json({ status: "User delete" });
+            res.status(200).json({ status: "User delete" });
         }).catch(e => console.log("Something went wrong...", e));
 });
 module.exports = router;
